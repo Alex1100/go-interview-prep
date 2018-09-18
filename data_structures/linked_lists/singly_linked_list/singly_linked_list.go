@@ -1,99 +1,114 @@
 package singly_linked_list
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 type Node struct {
-	data interface{}
-	next *Node
+	Data interface{}
+	Next *Node
 }
 
 type LinkedList struct {
-	head *Node
-	tail *Node
-	size int
+	Head *Node
+	Tail *Node
+	Size int
 }
 
-func InitLinkedList(data interface{}) *LinkedList {
-	head := &Node{
-		data: data,
-		next: nil,
+type HashTableLinkedList struct {
+	Head *Node
+	Tail *Node
+	Size int
+}
+
+func InitLinkedList(Data interface{}) *LinkedList {
+	Head := &Node{
+		Data: Data,
+		Next: nil,
 	}
 
-	tail := &Node{
-		data: data,
-		next: nil,
+	Tail := &Node{
+		Data: Data,
+		Next: nil,
 	}
 	return &LinkedList{
-		head: head,
-		tail: tail,
-		size: 1,
+		Head: Head,
+		Tail: Tail,
+		Size: 1,
 	}
 }
 
-func (sll *LinkedList) Head() *Node {
-	return sll.head
-}
-
-func (sll *LinkedList) Data(node *Node) interface{} {
-	return node.data
-}
-
-func (sll *LinkedList) Next(node *Node) *Node {
-	return node.next
-}
-
-func (sll *LinkedList) Insert(data interface{}) {
-	current := sll.head
-
-	for current.next != nil {
-		current = current.next
+func InitEmptyLinkedList() *LinkedList {
+	Head := &Node{
+		Data: nil,
+		Next: nil,
 	}
 
-	current.next = &Node{
-		data: data,
-		next: nil,
+	Tail := &Node{
+		Data: nil,
+		Next: nil,
 	}
-
-	sll.tail = current.next
-	sll.size++
+	return &LinkedList{
+		Head: Head,
+		Tail: Tail,
+		Size: 0,
+	}
 }
 
-func (sll *LinkedList) AppendToHead(data interface{}) {
-	next := sll.head.next
+func (sll *LinkedList) Insert(Data interface{}) {
+	current := sll.Head
 
-	sll.head.next = &Node{
-		data: data,
-		next: next,
+	for current.Next != nil {
+		current = current.Next
 	}
-	sll.size++
+
+	current.Next = &Node{
+		Data: Data,
+		Next: nil,
+	}
+
+	sll.Tail = current.Next
+	sll.Size++
 }
 
-func (sll *LinkedList) PrependToTail(data interface{}) {
-	current := sll.head
+func (sll *LinkedList) AppendToHead(Data interface{}) {
+	Next := sll.Head.Next
 
-	for current.next.next != nil {
-		current = current.next
+	sll.Head.Next = &Node{
+		Data: Data,
+		Next: Next,
+	}
+	sll.Size++
+}
+
+func (sll *LinkedList) PrependToTail(Data interface{}) {
+	current := sll.Head
+
+	for current.Next.Next != nil {
+		current = current.Next
 	}
 
-	temp := current.next
-	current.next = &Node{
-		data: data,
-		next: temp,
+	temp := current.Next
+	current.Next = &Node{
+		Data: Data,
+		Next: temp,
 	}
 
-	sll.size++
+	sll.Size++
 }
 
 func (sll *LinkedList) GetByKey(key interface{}) (*Node, error) {
-	current := sll.head
+	current := sll.Head
 
-	if current.data == key {
+	if current.Data == key {
 		return current, nil
 	}
 
-	for current.next != nil {
-		current = current.next
-		if current.data == key {
+	for current.Next != nil {
+		current = current.Next
+		if current.Data == key {
 			return current, nil
 		}
 	}
@@ -102,14 +117,14 @@ func (sll *LinkedList) GetByKey(key interface{}) (*Node, error) {
 }
 
 func (sll *LinkedList) GetByIndex(index int) (*Node, error) {
-	current := sll.head
+	current := sll.Head
 	counter := 0
 	if counter == index {
 		return current, nil
 	}
 
-	for current.next != nil {
-		current = current.next
+	for current.Next != nil {
+		current = current.Next
 		counter++
 		if counter == index {
 			return current, nil
@@ -120,41 +135,41 @@ func (sll *LinkedList) GetByIndex(index int) (*Node, error) {
 }
 
 func (sll *LinkedList) RemoveNode(key interface{}) *Node {
-	current := sll.head
-	prev := sll.head
+	current := sll.Head
+	prev := sll.Head
 	var removed *Node
 
-	if current.data == key {
-		sll.head = current.next
-		sll.head.next = current.next.next
-		sll.size--
+	if current.Data == key {
+		sll.Head = current.Next
+		sll.Head.Next = current.Next.Next
+		sll.Size--
 		return current
 	} else {
-		for current.next != nil {
+		for current.Next != nil {
 			prev = current
-			current = current.next
-			if current.data == key {
-				prev.next = current.next
+			current = current.Next
+			if current.Data == key {
+				prev.Next = current.Next
 				removed = current
-				sll.size--
+				sll.Size--
 				return removed
 			}
 		}
 
-		sll.tail = prev
-		sll.size--
+		sll.Tail = prev
+		sll.Size--
 		return removed
 	}
 }
 
 func (sll *LinkedList) ListToSlice() []interface{} {
 	list := make([]interface{}, 0)
-	current := sll.head
-	list = append(list, current.data)
+	current := sll.Head
+	list = append(list, current.Data)
 
-	for current.next != nil {
-		current = current.next
-		list = append(list, current.data)
+	for current.Next != nil {
+		current = current.Next
+		list = append(list, current.Data)
 	}
 
 	return list
@@ -162,23 +177,245 @@ func (sll *LinkedList) ListToSlice() []interface{} {
 
 func (sll *LinkedList) Clone() *LinkedList {
 	cloned_linked_list := &LinkedList{
-		head: sll.head,
-		tail: sll.tail,
-		size: 1,
+		Head: sll.Head,
+		Tail: sll.Tail,
+		Size: 1,
 	}
 
-	current := sll.head
-	current_cloned := cloned_linked_list.head
-	for current.next != nil {
-		current = current.next
-		current_cloned.next = current
-		cloned_linked_list.size++
-		current_cloned = current_cloned.next
+	current := sll.Head
+	current_cloned := cloned_linked_list.Head
+	for current.Next != nil {
+		current = current.Next
+		current_cloned.Next = current
+		cloned_linked_list.Size++
+		current_cloned = current_cloned.Next
 	}
 
 	return cloned_linked_list
 }
 
-func (sll *LinkedList) Size() int {
-	return sll.size
+// HASH TABLE LINKED LIST
+func InitHashTableLinkedList(Data interface{}) *HashTableLinkedList {
+	Head := &Node{
+		Data: Data,
+		Next: nil,
+	}
+
+	Tail := &Node{
+		Data: Data,
+		Next: nil,
+	}
+	return &HashTableLinkedList{
+		Head: Head,
+		Tail: Tail,
+		Size: 1,
+	}
+}
+
+func InitEmptyHashTableLinkedList() *HashTableLinkedList {
+	Head := &Node{
+		Data: nil,
+		Next: nil,
+	}
+
+	Tail := &Node{
+		Data: nil,
+		Next: nil,
+	}
+	return &HashTableLinkedList{
+		Head: Head,
+		Tail: Tail,
+		Size: 0,
+	}
+}
+
+func (sll *HashTableLinkedList) Insert(Data []interface{}) {
+	current := sll.Head
+
+	for current.Next != nil {
+		current = current.Next
+	}
+
+	current.Next = &Node{
+		Data: Data,
+		Next: nil,
+	}
+
+	sll.Tail = current.Next
+	sll.Size++
+}
+
+func (sll *HashTableLinkedList) AppendToHead(Data []interface{}) {
+	Next := sll.Head.Next
+
+	sll.Head.Next = &Node{
+		Data: Data,
+		Next: Next,
+	}
+	sll.Size++
+}
+
+func (sll *HashTableLinkedList) PrependToTail(Data []interface{}) {
+	current := sll.Head
+
+	for current.Next.Next != nil {
+		current = current.Next
+	}
+
+	temp := current.Next
+	current.Next = &Node{
+		Data: Data,
+		Next: temp,
+	}
+
+	sll.Size++
+}
+
+func (sll *HashTableLinkedList) GetByKey(key []interface{}) (*Node, error) {
+	current := sll.Head
+	temp1 := make([]interface{}, 0)
+	temp2 := make([]interface{}, 0)
+	temp1 = append(temp1, current.Data)
+	temp2 = append(temp2, key)
+	if sliceToString(temp1) == sliceToString(temp2) {
+		return current, nil
+	}
+
+	for current.Next != nil {
+		current = current.Next
+		temp3 := make([]interface{}, 0)
+		temp4 := make([]interface{}, 0)
+		temp3 = append(temp3, current.Data)
+		temp4 = append(temp4, key)
+		if sliceToString(temp3) == sliceToString(temp4) {
+			return current, nil
+		}
+	}
+
+	panic(errors.New("Does Not Exist"))
+}
+
+func (sll *HashTableLinkedList) GetByIndex(index int) (*Node, error) {
+	current := sll.Head
+	counter := 0
+	if counter == index {
+		return current, nil
+	}
+
+	for current.Next != nil {
+		current = current.Next
+		counter++
+		if counter == index {
+			return current, nil
+		}
+	}
+
+	panic(errors.New("Does Not Exist"))
+}
+
+func (sll *HashTableLinkedList) RemoveNode(key []interface{}) *Node {
+	current := sll.Head
+	prev := sll.Head
+	var removed *Node
+
+	temp1 := make([]interface{}, 0)
+	temp2 := make([]interface{}, 0)
+	temp1 = append(temp1, current.Data)
+	temp2 = append(temp2, key)
+
+	if sliceToString(temp1) == sliceToString(temp2) {
+		sll.Head = current.Next
+		sll.Head.Next = current.Next.Next
+		sll.Size--
+		return current
+	} else {
+		for current.Next != nil {
+			prev = current
+			current = current.Next
+			temp3 := make([]interface{}, 0)
+			temp4 := make([]interface{}, 0)
+			temp3 = append(temp3, current.Data)
+			temp4 = append(temp4, key)
+			if sliceToString(temp3) == sliceToString(temp4) {
+				prev.Next = current.Next
+				removed = current
+				sll.Size--
+				return removed
+			}
+		}
+
+		sll.Tail = prev
+		sll.Size--
+		return removed
+	}
+}
+
+func (sll *HashTableLinkedList) ListToSlice() []interface{} {
+	list := make([]interface{}, 0)
+	current := sll.Head
+	list = append(list, current.Data)
+
+	for current.Next != nil {
+		current = current.Next
+		list = append(list, current.Data)
+	}
+
+	return list
+}
+
+func (sll *HashTableLinkedList) ListOfKeys() []interface{} {
+	list := make([]interface{}, 0)
+	current := sll.Head
+	data1 := current.Data.([]interface{})[0]
+	list = append(list, data1)
+
+	for current.Next != nil {
+		current = current.Next
+		data2 := current.Data.([]interface{})[0]
+		list = append(list, data2)
+	}
+
+	return list
+}
+
+func (sll *HashTableLinkedList) ListOfValues() []interface{} {
+	list := make([]interface{}, 0)
+	current := sll.Head
+	data1 := current.Data.([]interface{})[1]
+	list = append(list, data1)
+
+	for current.Next != nil {
+		current = current.Next
+		data2 := current.Data.([]interface{})[1]
+		list = append(list, data2)
+	}
+
+	return list
+}
+
+func (sll *HashTableLinkedList) Clone() *HashTableLinkedList {
+	cloned_linked_list := &HashTableLinkedList{
+		Head: sll.Head,
+		Tail: sll.Tail,
+		Size: 1,
+	}
+
+	current := sll.Head
+	current_cloned := cloned_linked_list.Head
+	for current.Next != nil {
+		current = current.Next
+		current_cloned.Next = current
+		cloned_linked_list.Size++
+		current_cloned = current_cloned.Next
+	}
+
+	return cloned_linked_list
+}
+
+func sliceToString(values []interface{}) string {
+	s := make([]string, len(values)) // Pre-allocate the right size
+	for index := range values {
+		s[index] = fmt.Sprintf("%v", values[index])
+	}
+	return strings.Join(s, ",")
 }
