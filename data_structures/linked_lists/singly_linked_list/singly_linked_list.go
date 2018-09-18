@@ -231,18 +231,25 @@ func InitEmptyHashTableLinkedList() *HashTableLinkedList {
 
 func (sll *HashTableLinkedList) Insert(Data []interface{}) {
 	current := sll.Head
+	if current.Data == nil {
+		current.Data = Data
+		current.Next = nil
+		sll.Tail = current
+		sll.Size++
+	} else {
 
-	for current.Next != nil {
-		current = current.Next
+		for current.Next != nil {
+			current = current.Next
+		}
+
+		current.Next = &Node{
+			Data: Data,
+			Next: nil,
+		}
+		fmt.Println("CURRENT SHOULD BE: ", current.Next.Data)
+		sll.Tail = current.Next
+		sll.Size++
 	}
-
-	current.Next = &Node{
-		Data: Data,
-		Next: nil,
-	}
-
-	sll.Tail = current.Next
-	sll.Size++
 }
 
 func (sll *HashTableLinkedList) AppendToHead(Data []interface{}) {
