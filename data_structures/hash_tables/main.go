@@ -26,5 +26,25 @@ func main() {
 	fmt.Println("\n\nCHECK SIZE:: ", ht.Size)
 	fmt.Println("\n\nCHECK CONTAINS Hello:: ", ht.Contains("Hello", 0))
 	fmt.Println("\n\nCHECK CONTAINS DUCK:: ", ht.Contains("DUCK", 0))
-	fmt.Println("\n\nREMOVE NEEDS WORK.. CHECK REMOVE:::", ht.Remove("Hello", 0))
+	fmt.Println(ht.Storage[8].Head.Data)
+	fmt.Println("DERRRP: ", ht.Storage[8].Size)
+
+	removed1, err := ht.Remove("Hello", 0)
+	if err == nil {
+		fmt.Println("\n\nREMOVE NEEDS WORK.. CHECK REMOVE:::", removed1)
+	}
+	fmt.Println("DERRRP: ", ht.Storage[8].Head, ht.Storage[8].Tail)
+	ht.Remove("Should have crossed Threshold", 0)
+	fmt.Println("LANDING")
+	ht.Remove("Yoo", 0)
+	// fmt.Println(ht)
+	ht.Remove("", 99)
+	ht.Remove("", 100)
+	ht.Remove("", 33)
+
+	ht.Remove("Crossing Threshold", 0)
+	fmt.Println(ht.Storage)
+	ht.Insert("A", 0, "Alex")
+	fmt.Println("\n\n\n\n")
+	fmt.Println("\nHASH TABLE IS NOW: ", ht)
 }

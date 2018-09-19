@@ -2,7 +2,6 @@ package singly_linked_list
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -246,7 +245,6 @@ func (sll *HashTableLinkedList) Insert(Data []interface{}) {
 			Data: Data,
 			Next: nil,
 		}
-		fmt.Println("CURRENT SHOULD BE: ", current.Next.Data)
 		sll.Tail = current.Next
 		sll.Size++
 	}
@@ -320,40 +318,40 @@ func (sll *HashTableLinkedList) GetByIndex(index int) (*Node, error) {
 	panic(errors.New("Does Not Exist"))
 }
 
-func (sll *HashTableLinkedList) RemoveNode(key []interface{}) *Node {
+func (sll *HashTableLinkedList) RemoveNode(key []interface{}) (interface{}, *HashTableLinkedList) {
 	current := sll.Head
 	prev := sll.Head
 	var removed *Node
+	iteration_counter := 0
 
 	temp1 := make([]interface{}, 0)
-	temp2 := make([]interface{}, 0)
 	temp1 = append(temp1, current.Data)
-	temp2 = append(temp2, key)
 
-	if sliceToString(temp1) == sliceToString(temp2) {
-		sll.Head = current.Next
-		sll.Head.Next = current.Next.Next
+	if sliceToString(temp1) == sliceToString(key) {
+		sll.Head = prev.Next
 		sll.Size--
-		return current
+		return current.Data, sll
 	} else {
-		for current.Next != nil {
+		for iteration_counter < sll.Size-1 {
 			prev = current
 			current = current.Next
-			temp3 := make([]interface{}, 0)
-			temp4 := make([]interface{}, 0)
-			temp3 = append(temp3, current.Data)
-			temp4 = append(temp4, key)
-			if sliceToString(temp3) == sliceToString(temp4) {
+			temp2 := make([]interface{}, 0)
+			temp2 = append(temp2, current.Data)
+
+			if sliceToString(temp2) == sliceToString(key) {
 				prev.Next = current.Next
 				removed = current
+				if iteration_counter == sll.Size-1 {
+					sll.Tail = prev
+				}
 				sll.Size--
-				return removed
+				return removed, sll
 			}
 		}
 
 		sll.Tail = prev
 		sll.Size--
-		return removed
+		return removed, sll
 	}
 }
 

@@ -2,7 +2,6 @@ package hash_table
 
 import (
 	"errors"
-	"fmt"
 	singly_linked_list "go-interview-prep/data_structures/linked_lists/singly_linked_list"
 	"math"
 	"strings"
@@ -37,7 +36,7 @@ func InitHashTable(initial_size int) *HashTable {
 
 func (ht *HashTable) Hash(str_key string, num_key int) int {
 	hash := 0
-  fmt.Println("STR KEY IS: ", str_key, num_key)
+
 	if len(str_key) > 0 {
 		for i := 0; i < len(str_key); i++ {
 			hash = (hash << 5) + hash
@@ -55,13 +54,9 @@ func (ht *HashTable) Hash(str_key string, num_key int) int {
 }
 
 func (ht *HashTable) Insert(str_key string, num_key int, data interface{}) bool {
-	fmt.Println("HT IS: ", ht.Size)
-
 	if ht.Size == int(math.Floor(float64(ht.StorageLimit)*float64(0.625))) {
 		ht.Expand()
 	}
-
-	fmt.Println("NOW HT IS: ", ht.Size)
 
 	bucket_index := ht.Hash(str_key, num_key)
 
@@ -111,29 +106,25 @@ func (ht *HashTable) InsertUtil(bucket_index int, str_key string, num_key int, d
 	return true
 }
 
-func (ht *HashTable) Remove(str_key string, num_key int) (*singly_linked_list.Node, error) {
-	fmt.Println("YOOO: ", str_key, num_key)
-	if ht.Size <= int(math.Floor(float64(ht.StorageLimit)*float64(0.4))) {
+func (ht *HashTable) Remove(str_key string, num_key int) (interface{}, error) {
+	iteration_counter := 0
+	var removed *singly_linked_list.Node
+
+	if ht.Size <= int(math.Floor(float64(ht.StorageLimit)*float64(0.25))) {
 		ht.Shrink()
 	}
 
-  bucket_index := 0
-  if len(str_key) > 0
-	  bucket_index = ht.Hash(str_key, 0)
-  } else {
-    bucket_index = ht.Hash("", num_key)
-  }
+	bucket_index := ht.Hash(str_key, num_key)
 
 	if bucket_index > ht.StorageLimit {
 		panic(errors.New("Invalid Hash"))
 	}
 
 	target := make([]interface{}, 0)
-
 	current_bucket := ht.Storage[bucket_index]
 	current := current_bucket.Head
 
-	for current.Data != nil {
+	for iteration_counter < ht.Storage[bucket_index].Size {
 		temp1 := make([]interface{}, 0)
 		temp2 := make([]interface{}, 0)
 		temp3 := make([]interface{}, 0)
@@ -152,37 +143,60 @@ func (ht *HashTable) Remove(str_key string, num_key int) (*singly_linked_list.No
 
 		if sliceToString(temp1) == sliceToString(temp2) || sliceToString(temp1) == sliceToString(temp3) {
 			target = append(target, current.Data)
-			current = nil
+			current := ht.Storage[bucket_index].Head
+			prev := ht.Storage[bucket_index].Head
+			iteration_counter := 0
+			temp1 := make([]interface{}, 0)
+			temp1 = append(temp1, current.Data)
+
+			if sliceToString(temp1) == sliceToString(target) {
+				if ht.Storage[bucket_index].Size == 1 {
+					ht.Storage[bucket_index].Head = &singly_linked_list.Node{Data: nil, Next: nil}
+					ht.Storage[bucket_index].Size--
+				} else {
+					ht.Storage[bucket_index].Head = prev.Next
+					ht.Storage[bucket_index].Size--
+				}
+
+				ht.Size--
+				return current.Data, nil
+			} else {
+				for iteration_counter < ht.Storage[bucket_index].Size {
+					if iteration_counter < ht.Storage[bucket_index].Size-1 {
+						ht.Storage[bucket_index].Tail = current
+					}
+					current = current.Next
+					temp2 := make([]interface{}, 0)
+					temp2 = append(temp2, current.Data)
+
+					if sliceToString(temp2) == sliceToString(target) {
+						prev.Next = current.Next
+						removed = current
+						ht.Storage[bucket_index].Size--
+						ht.Size--
+						return removed, nil
+					}
+				}
+
+				ht.Storage[bucket_index].Size--
+				ht.Size--
+				return removed, nil
+			}
+
+			ht.Size--
+
+			return removed, nil
 		} else {
 			current = current.Next
 		}
+		iteration_counter++
 	}
 
-	temp4 := make([]interface{}, 0)
-	temp5 := make([]interface{}, 0)
-	temp6 := make([]interface{}, 0)
-	counter := 0
-	temp5 = append(temp5, str_key)
-	temp6 = append(temp6, num_key)
-
-	val, _ := current.Data.([]interface{})
-
-	for _, value := range val {
-		if counter == 0 {
-			temp4 = append(temp4, value)
-			counter++
-		}
-	}
-	if sliceToString(temp4) == sliceToString(temp5) || sliceToString(temp4) == sliceToString(temp6) {
-		removed := current_bucket.RemoveNode(target)
-		ht.Size--
-		return removed, nil
-	} else {
-		panic(errors.New("Does not exist in Hash Table"))
-	}
+	panic(errors.New("Does not exist in Hash Table"))
 }
 
 func (ht *HashTable) Get(str_key string, num_key int) ([]interface{}, error) {
+	iteration_counter := 0
 	bucket_index := ht.Hash(str_key, num_key)
 	if bucket_index > ht.StorageLimit {
 		panic(errors.New("Invalid Hash"))
@@ -191,7 +205,7 @@ func (ht *HashTable) Get(str_key string, num_key int) ([]interface{}, error) {
 	current_bucket := ht.Storage[bucket_index]
 	current := current_bucket.Head
 
-	for current.Data != nil {
+	for iteration_counter < current_bucket.Size {
 		temp1 := make([]interface{}, 0)
 		temp2 := make([]interface{}, 0)
 		temp3 := make([]interface{}, 0)
@@ -213,6 +227,7 @@ func (ht *HashTable) Get(str_key string, num_key int) ([]interface{}, error) {
 		}
 
 		current = current.Next
+		iteration_counter++
 	}
 
 	panic(errors.New("Does not exist in Hash Table"))
@@ -299,13 +314,13 @@ func (ht *HashTable) Shrink() {
 	temp_vals := make([]interface{}, 0)
 
 	for i := 0; i < len(ht.Storage); i++ {
-		if ht.Storage[i].Head.Data != nil {
+		if ht.Storage[i].Head != nil && ht.Storage[i].Head.Data != nil {
 			for _, key := range ht.Storage[i].ListOfKeys() {
 				temp_keys = append(temp_keys, key)
 			}
 
 			for _, val := range ht.Storage[i].ListOfValues() {
-				temp_keys = append(temp_vals, val)
+				temp_vals = append(temp_vals, val)
 			}
 		}
 	}
@@ -339,8 +354,6 @@ func sliceToString(values []interface{}) string {
 	for index := range values {
 		s[index] = fmt.Sprintf("%v", values[index])
 	}
-
-	fmt.Println("s IS: ", strings.Join(s, ","))
 
 	return strings.Join(s, ",")
 }
