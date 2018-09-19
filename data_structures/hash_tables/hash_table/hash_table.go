@@ -2,6 +2,7 @@ package hash_table
 
 import (
 	"errors"
+	"fmt"
 	singly_linked_list "go-interview-prep/data_structures/linked_lists/singly_linked_list"
 	"math"
 	"strings"
