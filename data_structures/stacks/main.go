@@ -12,7 +12,7 @@ func main() {
 	oo.Insert(100)
 	oo.Insert(120)
 	fmt.Println(oo.Pop())
-	fmt.Println(oo.Items())
+	fmt.Println(oo.Items)
 
 	fmt.Println("NOW WORKING ON QUEUE FROM STACKS:::")
 	qq := *queue.InitQueue()
@@ -20,7 +20,7 @@ func main() {
 	qq.Enqueue(30)
 	qq.Enqueue(150)
 	fmt.Println(qq.Dequeue())
-	fmt.Println(qq.Items())
+	fmt.Println(qq.Items)
 	qq.Enqueue(55)
 	fmt.Println(qq.ViewQueue())
 }

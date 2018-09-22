@@ -5,27 +5,27 @@ import (
 )
 
 type Queue struct {
-	entry_stack stack.Stack
-	queue       stack.Stack
-	size        int
+	EntryStack stack.Stack
+	Queue      stack.Stack
+	Size       int
 }
 
 func InitQueue() *Queue {
 	return &Queue{
-		entry_stack: *stack.InitStack(),
-		queue:       *stack.InitStack(),
-		size:        0,
+		EntryStack: *stack.InitStack(),
+		Queue:      *stack.InitStack(),
+		Size:       0,
 	}
 }
 
 func (q *Queue) Enqueue(item int) error {
-	q.entry_stack.Insert(item)
+	q.EntryStack.Insert(item)
 
-	for q.entry_stack.Size() > 0 {
-		popped, err := q.entry_stack.Pop()
+	for q.EntryStack.Size() > 0 {
+		popped, err := q.EntryStack.Pop()
 		if err == nil {
-			q.queue.Insert(popped)
-			q.size++
+			q.Queue.Insert(popped)
+			q.Size++
 		} else {
 			return err
 		}
@@ -35,19 +35,19 @@ func (q *Queue) Enqueue(item int) error {
 }
 
 func (q *Queue) Dequeue() (int, error) {
-	if q.entry_stack.IsEmpty() {
-		for !q.queue.IsEmpty() {
-			popped, err := q.queue.Pop()
+	if q.EntryStack.IsEmpty() {
+		for !q.Queue.IsEmpty() {
+			popped, err := q.Queue.Pop()
 
 			if err == nil {
-				q.entry_stack.Insert(popped)
+				q.EntryStack.Insert(popped)
 			} else {
 				panic(err)
 			}
 		}
 	}
 
-	removed, err := q.entry_stack.Pop()
+	removed, err := q.EntryStack.Pop()
 
 	if err == nil {
 		return removed, nil
@@ -57,30 +57,21 @@ func (q *Queue) Dequeue() (int, error) {
 }
 
 func (q *Queue) Peek() int {
-	return q.queue.Front()
+	return q.Queue.Front()
 }
 
 func (q *Queue) ViewQueue() stack.Stack {
-	if q.entry_stack.IsEmpty() {
-		return q.queue
+	if q.EntryStack.IsEmpty() {
+		return q.Queue
 	} else {
-		return q.entry_stack
+		return q.EntryStack
 	}
 }
 
 func (q *Queue) IsEmpty() bool {
-	if q.Size() == 0 {
+	if q.Size == 0 {
 		return true
 	}
 
 	return false
-}
-
-func (q *Queue) Items() []int {
-	current_queue := q.ViewQueue()
-	return current_queue.Items()
-}
-
-func (q *Queue) Size() int {
-	return q.size
 }
