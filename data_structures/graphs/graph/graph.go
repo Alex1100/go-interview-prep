@@ -2,8 +2,8 @@ package graph
 
 import (
 	"errors"
-	queue "go-interview-prep/data_structures/queues/queue"
-	stack "go-interview-prep/data_structures/stacks/stack"
+	queue "go-interview-prep/data_structures/queues/graph_queue"
+	stack "go-interview-prep/data_structures/stacks/graph_stack"
 )
 
 type Edge struct {
@@ -194,6 +194,94 @@ func (g *Graph) RemoveEdges(from, to string) (map[string]*Edge, error) {
 	return removed_edges, nil
 }
 
-func (g *Graph) DepthFirstSearch(source_node_key string) *stack.Stack.Items {
-  // to-do
+func (g *Graph) DFSUtil(
+	source_node string,
+	visited map[string]bool,
+	visited_stack *stack.Stack,
+) *stack.Stack {
+	if visited_stack.Size < len(g.NodeArray) {
+		if !visited[source_node] {
+			visited[source_node] = true
+			visited_stack.Insert(source_node)
+		}
+
+		for _, edge := range g.Vertexes[source_node].Edges {
+			if !visited[edge.Key] {
+				visited_stack = g.DFSUtil(edge.Key, visited, visited_stack)
+			}
+		}
+	}
+	return visited_stack
+}
+
+func (g *Graph) DepthFirstSearch(source_node_key string) (*stack.Stack, error) {
+	if g.Vertexes[source_node_key] == nil {
+		panic(errors.New("Vertex is not a member of the graph"))
+	}
+
+	visited := make(map[string]bool)
+
+	for _, vertex := range g.NodeArray {
+		visited[vertex] = false
+	}
+
+	visited_stack := &stack.Stack{Items: make([]string, 0), Size: 0}
+	visited_stack = g.DFSUtil(source_node_key, visited, visited_stack)
+
+	for _, vertex := range g.NodeArray {
+		visited_stack = g.DFSUtil(vertex, visited, visited_stack)
+	}
+
+	return visited_stack, nil
+}
+
+func (g *Graph) BFSUtil(
+	source_node string,
+	result *queue.Queue,
+	visited map[string]bool,
+	node_queue *queue.Queue,
+) *queue.Queue {
+	if result.Size < len(g.NodeArray) {
+		if !visited[source_node] {
+			visited[source_node] = true
+			result.Enqueue(source_node)
+		}
+
+		if node_queue.Contains(source_node) {
+			node_queue.Dequeue()
+		}
+		for _, edge := range g.Vertexes[source_node].Edges {
+			if !visited[edge.Key] {
+				node_queue.Enqueue(edge.Key)
+			}
+		}
+
+		for _, node := range node_queue.Items {
+			result = g.BFSUtil(node, result, visited, node_queue)
+		}
+	}
+
+	return result
+}
+
+func (g *Graph) BreadthFirstSearch(source_node_key string) (*queue.Queue, error) {
+	if g.Vertexes[source_node_key] == nil {
+		panic(errors.New("Vertex is not a member of the graph"))
+	}
+
+	visited := make(map[string]bool)
+	result := &queue.Queue{Items: make([]string, 0), Size: 0}
+	node_queue := &queue.Queue{Items: make([]string, 0), Size: 0}
+
+	for _, vertex := range g.NodeArray {
+		visited[vertex] = false
+	}
+
+	result = g.BFSUtil(source_node_key, result, visited, node_queue)
+
+	for _, vertex := range g.NodeArray {
+		result = g.BFSUtil(vertex, result, visited, node_queue)
+	}
+
+	return result, nil
 }

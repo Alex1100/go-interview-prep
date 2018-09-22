@@ -55,4 +55,22 @@ func main() {
 
 	fmt.Println(g.Vertexes["E"].Edges, g.Vertexes["D"].Edges)
 
+	g.AddEdge("C", "E")
+	g.AddEdge("C", "F")
+	g.AddEdge("D", "H")
+	dfs, err := g.DepthFirstSearch("E")
+
+	if err == nil {
+		fmt.Println(dfs.Items)
+	} else {
+		fmt.Println(err)
+	}
+
+	bfs, err := g.BreadthFirstSearch("D")
+
+	if err == nil {
+		fmt.Println(bfs.Items)
+	} else {
+		fmt.Println(err)
+	}
 }
