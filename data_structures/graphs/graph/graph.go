@@ -445,7 +445,7 @@ func (g *Graph) HasCycle() bool {
 }
 
 func (g *Graph) TopologicalSort() ([]string, error) {
-	if !g.HasCycle() {
+	if g.HasCycle() {
 		return make([]string, 0), errors.New("Can't sort a Cyclic Graph")
 	}
 
@@ -457,6 +457,7 @@ func (g *Graph) TopologicalSort() ([]string, error) {
 	for _, vertex := range g.NodeArray {
 		for _, edge := range g.Vertexes[vertex].Edges {
 			if edge.EdgeValues["direction"] == 1 {
+				visited[vertex] = true
 				non_dependent_vertexes.Insert(vertex)
 				break
 			}
@@ -467,7 +468,7 @@ func (g *Graph) TopologicalSort() ([]string, error) {
 
 	for counter > 0 {
 		for _, edge := range g.Vertexes[non_dependent_vertexes.Front()].Edges {
-			if !!visited[edge.Key] && edge.EdgeValues["direction"] == 1 {
+			if !visited[edge.Key] && edge.EdgeValues["direction"] == 1 {
 				vertex_stack.Insert(edge.Key)
 				visited[edge.Key] = true
 			}

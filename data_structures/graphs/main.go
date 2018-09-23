@@ -83,16 +83,31 @@ func main() {
 	dijkstra := g.Dijkstra("C", "B")
 	fmt.Println("PATH COSTS ARE: ", dijkstra.ShortestDistance)
 	fmt.Println("PATHS ARE: ", len(dijkstra.ShortestPath), dijkstra.ShortestPath)
-	fmt.Println("ACYCLIC???: ", g.HasCycle())
+	fmt.Println("CYCLIC???: ", g.HasCycle())
 	gr := *graph.InitGraph()
 	gr.AddVertex("1234")
 	gr.AddVertex("098")
 	gr.AddEdge("1234", "098")
-	fmt.Println("ACYCLIC???: ", gr.HasCycle())
+	gr.AddVertex("333")
+	gr.AddEdge("098", "333")
+	gr.AddVertex("433")
+	gr.AddEdge("098", "433")
+	gr.AddVertex("998")
+	gr.AddEdge("1234", "998")
+
+	fmt.Println("CYCLIC???: ", gr.HasCycle())
 	ordering, err := g.TopologicalSort()
 
 	if err == nil {
 		fmt.Println(ordering)
+	} else {
+		fmt.Println(err)
+	}
+
+	toppped, err := gr.TopologicalSort()
+
+	if err == nil {
+		fmt.Println(toppped)
 	} else {
 		fmt.Println(err)
 	}
