@@ -57,7 +57,12 @@ func main() {
 
 	g.AddEdge("C", "E")
 	g.AddEdge("C", "F")
-	g.AddEdge("D", "H")
+	g.AddEdges("D", "H")
+	g.AddEdges("H", "C")
+	g.AddEdges("B", "E")
+	g.AddEdges("E", "F")
+	g.AddEdge("B", "H")
+	g.AddEdges("E", "D")
 	dfs, err := g.DepthFirstSearch("E")
 
 	if err == nil {
@@ -74,5 +79,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(g.Dijkstra("F", "D"))
+	dijkstra := g.Dijkstra("C", "B")
+	fmt.Println("PATH COSTS ARE: ", dijkstra.ShortestDistance)
+	fmt.Println("PATHS ARE: ", len(dijkstra.ShortestPath), dijkstra.ShortestPath)
 }

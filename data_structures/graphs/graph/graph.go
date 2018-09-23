@@ -2,12 +2,10 @@ package graph
 
 import (
 	"errors"
-	"fmt"
 	queue "go-interview-prep/data_structures/queues/graph_queue"
 	stack "go-interview-prep/data_structures/stacks/graph_stack"
 	"math"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -20,7 +18,7 @@ type Prev struct {
 }
 
 type DijkstraValue struct {
-	ShortestDistance int
+	ShortestDistance float64
 	ShortestPath     []string
 }
 
@@ -313,7 +311,6 @@ func (g *Graph) BreadthFirstSearch(source_node_key string) (*queue.Queue, error)
 func (g *Graph) CostLength(u, v string) int {
 	for _, edge := range g.Vertexes[u].Edges {
 		if edge.Key == v {
-			fmt.Println("AYYYO: ", edge.EdgeValues["weight"])
 			return edge.EdgeValues["weight"]
 		}
 	}
@@ -321,56 +318,53 @@ func (g *Graph) CostLength(u, v string) int {
 	return 0
 }
 
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *Graph) ExtractDijkstraMin(
 	dj_set map[string]*Vertex,
-	dist map[string]int,
+	dist map[string]float64,
+	deleted_set []string,
 ) string {
-	minimum_distance := int(math.Inf(1))
+	minimum_distance := math.Inf(1)
 	var node_with_min_distance string
 
 	for vertex, _ := range dj_set {
-		fmt.Println("CURRENT VERTEX IS: ", dj_set, dist)
-		if dist[vertex] <= minimum_distance {
+		if contains(deleted_set, vertex) == false && dist[vertex] <= minimum_distance {
 			minimum_distance = dist[vertex]
 			node_with_min_distance = vertex
 		}
 	}
-	fmt.Println("CHECK:: ", dist[node_with_min_distance])
+
 	return node_with_min_distance
 }
 
 func (g *Graph) GetShortestPath(
 	destination_node string,
-	shortest_path map[string]string,
-	prev map[string]int,
-	dist map[string]int,
+	shortest_path map[string][]string,
+	prev map[string]string,
+	dist map[string]float64,
 ) []string {
-	count := 0
-	node := shortest_path[destination_node]
-	path := make([]string, 0)
-	path = append(path, node)
-	var num string
+	count := len(prev)
+	path := shortest_path[destination_node]
+	node := destination_node
 
-	if count == 0 {
-		num = node
-	} else {
-		num = node
+	for count > 0 {
+		if len(node) >= 1 {
+			path = append(path, node)
+			node = prev[node]
+		}
+
+		count--
 	}
 
-	for prev[num] != 0 {
-		path = append(path, num)
-		s := strconv.Itoa(prev[num])
-		node = s
-		count++
-	}
-
-	if dist[num] == 0 {
-		path = append(path, num)
-	}
-
-	path = ReverseStringSlice(path)
-
-	return path
+	return ReverseStringSlice(path)
 }
 
 func ReverseStringSlice(slice []string) []string {
@@ -383,33 +377,35 @@ func ReverseStringSlice(slice []string) []string {
 
 func (g *Graph) Dijkstra(source_node, destination_node string) *DijkstraValue {
 	dj_set := make(map[string]*Vertex, 0)
-	shortest_path := make(map[string]string)
-	dist := make(map[string]int)
-	prev := make(map[string]int)
+	shortest_path := make(map[string][]string)
+	dist := make(map[string]float64)
+	prev := make(map[string]string)
+	deleted_set := make([]string, 0)
 
 	for _, vertex := range g.NodeArray {
-		dist[vertex] = int(math.Inf(0))
+		dist[vertex] = math.Inf(0)
 		dj_set[vertex] = g.Vertexes[vertex]
 	}
 
-	dist[source_node] = 0
-	prev[source_node] = 0
+	dist[source_node] = float64(0)
+	shortest_path[destination_node] = make([]string, 0)
+	counter := len(dj_set)
 
-	for len(dj_set) > 0 {
-		u := g.ExtractDijkstraMin(dj_set, dist)
+	for len(deleted_set) != counter {
+		u := g.ExtractDijkstraMin(dj_set, dist, deleted_set)
 
-		for _, edge := range g.Vertexes[u].Edges {
-			alt := dist[u] + g.CostLength(u, edge.Key)
-			fmt.Println("DIST IS: ", dist[edge.Key], "\n", alt)
-			if alt < dist[edge.Key] {
-				uu := dist[u]
-				dist[edge.Key] = alt
-				fmt.Println("U IS: ", uu)
-				prev[edge.Key] = uu
+		if g.Vertexes[u] != nil {
+			for _, edge := range g.Vertexes[u].Edges {
+				alt := dist[u] + float64(g.CostLength(u, edge.Key))
+
+				if alt < dist[edge.Key] {
+					dist[edge.Key] = alt
+					prev[edge.Key] = u
+				}
 			}
 		}
 
-		delete(dj_set, u)
+		deleted_set = append(deleted_set, u)
 	}
 
 	result := g.GetShortestPath(destination_node, shortest_path, prev, dist)
