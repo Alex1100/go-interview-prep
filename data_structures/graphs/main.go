@@ -73,4 +73,6 @@ func main() {
 	} else {
 		fmt.Println(err)
 	}
+
+	fmt.Println(g.Dijkstra("F", "D"))
 }

@@ -2,9 +2,27 @@ package graph
 
 import (
 	"errors"
+	"fmt"
 	queue "go-interview-prep/data_structures/queues/graph_queue"
 	stack "go-interview-prep/data_structures/stacks/graph_stack"
+	"math"
+	"math/rand"
+	"strconv"
+	"time"
 )
+
+type StringIntMap struct {
+	Val map[string]int
+}
+
+type Prev struct {
+	Prev *StringIntMap
+}
+
+type DijkstraValue struct {
+	ShortestDistance int
+	ShortestPath     []string
+}
 
 type Edge struct {
 	Key        string
@@ -38,19 +56,24 @@ func (g *Graph) AddVertex(node_val string) bool {
 	return true
 }
 
+func random(r *rand.Rand, min, max int) int {
+	return r.Intn(max-min) + min
+}
+
 func (g *Graph) AddEdge(from, to string) bool {
 	if !g.HasVertexes(to, from) || g.HasEdge(from, to) || g.SameEdge(from, to) {
 		return false
 	}
 	var to_edge_vals map[string]int
 	var from_edge_vals map[string]int
+	random_weight := random(rand.New(rand.NewSource(time.Now().Unix())), 1, 200)
 
 	to_edge_vals = make(map[string]int)
-	to_edge_vals["weight"] = 0
+	to_edge_vals["weight"] = random_weight
 	to_edge_vals["direction"] = 1
 
 	from_edge_vals = make(map[string]int)
-	from_edge_vals["weight"] = 0
+	from_edge_vals["weight"] = random_weight
 	from_edge_vals["direction"] = -1
 
 	g.Vertexes[to].Edges = append(g.Vertexes[to].Edges, &Edge{Key: from, EdgeValues: from_edge_vals})
@@ -89,13 +112,14 @@ func (g *Graph) AddEdges(from, to string) bool {
 	}
 	var to_edge_vals map[string]int
 	var from_edge_vals map[string]int
+	random_weight := random(rand.New(rand.NewSource(time.Now().Unix())), 1, 200)
 
 	to_edge_vals = make(map[string]int)
-	to_edge_vals["weight"] = 0
+	to_edge_vals["weight"] = random_weight
 	to_edge_vals["direction"] = 1
 
 	from_edge_vals = make(map[string]int)
-	from_edge_vals["weight"] = 0
+	from_edge_vals["weight"] = random_weight
 	from_edge_vals["direction"] = 1
 
 	g.Vertexes[to].Edges = append(g.Vertexes[to].Edges, &Edge{Key: from, EdgeValues: from_edge_vals})
@@ -284,4 +308,114 @@ func (g *Graph) BreadthFirstSearch(source_node_key string) (*queue.Queue, error)
 	}
 
 	return result, nil
+}
+
+func (g *Graph) CostLength(u, v string) int {
+	for _, edge := range g.Vertexes[u].Edges {
+		if edge.Key == v {
+			fmt.Println("AYYYO: ", edge.EdgeValues["weight"])
+			return edge.EdgeValues["weight"]
+		}
+	}
+
+	return 0
+}
+
+func (g *Graph) ExtractDijkstraMin(
+	dj_set map[string]*Vertex,
+	dist map[string]int,
+) string {
+	minimum_distance := int(math.Inf(1))
+	var node_with_min_distance string
+
+	for vertex, _ := range dj_set {
+		fmt.Println("CURRENT VERTEX IS: ", dj_set, dist)
+		if dist[vertex] <= minimum_distance {
+			minimum_distance = dist[vertex]
+			node_with_min_distance = vertex
+		}
+	}
+	fmt.Println("CHECK:: ", dist[node_with_min_distance])
+	return node_with_min_distance
+}
+
+func (g *Graph) GetShortestPath(
+	destination_node string,
+	shortest_path map[string]string,
+	prev map[string]int,
+	dist map[string]int,
+) []string {
+	count := 0
+	node := shortest_path[destination_node]
+	path := make([]string, 0)
+	path = append(path, node)
+	var num string
+
+	if count == 0 {
+		num = node
+	} else {
+		num = node
+	}
+
+	for prev[num] != 0 {
+		path = append(path, num)
+		s := strconv.Itoa(prev[num])
+		node = s
+		count++
+	}
+
+	if dist[num] == 0 {
+		path = append(path, num)
+	}
+
+	path = ReverseStringSlice(path)
+
+	return path
+}
+
+func ReverseStringSlice(slice []string) []string {
+	for i := len(slice)/2 - 1; i >= 0; i-- {
+		opp := len(slice) - 1 - i
+		slice[i], slice[opp] = slice[opp], slice[i]
+	}
+	return slice
+}
+
+func (g *Graph) Dijkstra(source_node, destination_node string) *DijkstraValue {
+	dj_set := make(map[string]*Vertex, 0)
+	shortest_path := make(map[string]string)
+	dist := make(map[string]int)
+	prev := make(map[string]int)
+
+	for _, vertex := range g.NodeArray {
+		dist[vertex] = int(math.Inf(0))
+		dj_set[vertex] = g.Vertexes[vertex]
+	}
+
+	dist[source_node] = 0
+	prev[source_node] = 0
+
+	for len(dj_set) > 0 {
+		u := g.ExtractDijkstraMin(dj_set, dist)
+
+		for _, edge := range g.Vertexes[u].Edges {
+			alt := dist[u] + g.CostLength(u, edge.Key)
+			fmt.Println("DIST IS: ", dist[edge.Key], "\n", alt)
+			if alt < dist[edge.Key] {
+				uu := dist[u]
+				dist[edge.Key] = alt
+				fmt.Println("U IS: ", uu)
+				prev[edge.Key] = uu
+			}
+		}
+
+		delete(dj_set, u)
+	}
+
+	result := g.GetShortestPath(destination_node, shortest_path, prev, dist)
+
+	return &DijkstraValue{
+		ShortestDistance: dist[destination_node],
+		ShortestPath:     result,
+	}
 }
