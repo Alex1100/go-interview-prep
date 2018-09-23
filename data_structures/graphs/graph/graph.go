@@ -444,6 +444,53 @@ func (g *Graph) HasCycle() bool {
 	return g.HasCycleUtil(g.NodeArray[0], visited, &visited_stack)
 }
 
-// func (g *Graph) TopologicalSort() []string {
-// 	// to-do
-// }
+func (g *Graph) TopologicalSort() ([]string, error) {
+	if !g.HasCycle() {
+		return make([]string, 0), errors.New("Can't sort a Cyclic Graph")
+	}
+
+	visited := make(map[string]bool)
+	non_dependent_vertexes := *stack.InitStack()
+	vertex_stack := *stack.InitStack()
+	result := make([]string, 0)
+
+	for _, vertex := range g.NodeArray {
+		for _, edge := range g.Vertexes[vertex].Edges {
+			if edge.EdgeValues["direction"] == 1 {
+				non_dependent_vertexes.Insert(vertex)
+				break
+			}
+		}
+	}
+
+	counter := non_dependent_vertexes.Size
+
+	for counter > 0 {
+		for _, edge := range g.Vertexes[non_dependent_vertexes.Front()].Edges {
+			if !!visited[edge.Key] && edge.EdgeValues["direction"] == 1 {
+				vertex_stack.Insert(edge.Key)
+				visited[edge.Key] = true
+			}
+		}
+
+		popped, err := non_dependent_vertexes.Pop()
+		if err == nil {
+			vertex_stack.Insert(popped)
+		} else {
+			return make([]string, 0), errors.New("Errored Popping item off stack")
+		}
+
+		counter--
+	}
+
+	for i := vertex_stack.Size; i > 0; i-- {
+		popped, err := vertex_stack.Pop()
+		if err == nil {
+			result = append(result, popped)
+		} else {
+			return make([]string, 0), errors.New("Errored Popping item off stack")
+		}
+	}
+
+	return result, nil
+}

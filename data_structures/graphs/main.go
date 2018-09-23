@@ -19,6 +19,7 @@ func main() {
 	g.AddEdge("A", "H")
 	g.AddEdge("H", "F")
 	g.AddEdges("E", "D")
+	g.AddEdge("G", "C")
 	fmt.Println("A EDGES: ", g.Vertexes["A"].Edges[0])
 	fmt.Println("H EDGES: ", g.Vertexes["H"].Edges[0])
 	removed, err := g.RemoveVertex("A")
@@ -88,4 +89,11 @@ func main() {
 	gr.AddVertex("098")
 	gr.AddEdge("1234", "098")
 	fmt.Println("ACYCLIC???: ", gr.HasCycle())
+	ordering, err := g.TopologicalSort()
+
+	if err == nil {
+		fmt.Println(ordering)
+	} else {
+		fmt.Println(err)
+	}
 }
