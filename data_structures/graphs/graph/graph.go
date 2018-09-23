@@ -415,3 +415,19 @@ func (g *Graph) Dijkstra(source_node, destination_node string) *DijkstraValue {
 		ShortestPath:     result,
 	}
 }
+
+func (g *Graph) HasCycleUtil(
+	source_node string,
+	visited map[string]bool,
+	visited_stack *stack.Stack,
+) bool {
+	// to-do
+}
+
+func (g *Graph) HasCycle() bool {
+	// to-do
+}
+
+func (g *Graph) TopologicalSort() []string {
+	// to-do
+}
