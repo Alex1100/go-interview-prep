@@ -464,9 +464,7 @@ func (g *Graph) TopologicalSort() ([]string, error) {
 		}
 	}
 
-	counter := non_dependent_vertexes.Size
-
-	for counter > 0 {
+	for non_dependent_vertexes.Size > 0 {
 		for _, edge := range g.Vertexes[non_dependent_vertexes.Front()].Edges {
 			if !visited[edge.Key] && edge.EdgeValues["direction"] == 1 {
 				vertex_stack.Insert(edge.Key)
@@ -480,11 +478,9 @@ func (g *Graph) TopologicalSort() ([]string, error) {
 		} else {
 			return make([]string, 0), errors.New("Errored Popping item off stack")
 		}
-
-		counter--
 	}
 
-	for i := vertex_stack.Size; i > 0; i-- {
+	for vertex_stack.Size > 0 {
 		popped, err := vertex_stack.Pop()
 		if err == nil {
 			result = append(result, popped)
