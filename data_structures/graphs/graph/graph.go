@@ -421,13 +421,29 @@ func (g *Graph) HasCycleUtil(
 	visited map[string]bool,
 	visited_stack *stack.Stack,
 ) bool {
-	// to-do
+	if !visited[source_node] {
+		visited[source_node] = true
+		visited_stack.Insert(source_node)
+
+		for _, edge := range g.Vertexes[source_node].Edges {
+			if !visited[edge.Key] && edge.EdgeValues["direction"] == 1 && g.HasCycleUtil(edge.Key, visited, visited_stack) {
+				return true
+			} else if visited_stack.Contains(edge.Key) && edge.EdgeValues["direction"] == 1 {
+				return true
+			}
+		}
+	}
+
+	visited_stack.Pop()
+	return false
 }
 
 func (g *Graph) HasCycle() bool {
-	// to-do
+	visited := make(map[string]bool)
+	visited_stack := *stack.InitStack()
+	return g.HasCycleUtil(g.NodeArray[0], visited, &visited_stack)
 }
 
-func (g *Graph) TopologicalSort() []string {
-	// to-do
-}
+// func (g *Graph) TopologicalSort() []string {
+// 	// to-do
+// }

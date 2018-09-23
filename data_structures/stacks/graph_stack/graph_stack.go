@@ -1,4 +1,4 @@
-package stack
+package graph_stack
 
 type Stack struct {
 	Items []string
@@ -38,6 +38,16 @@ func (s *Stack) Front() string {
 func (s *Stack) IsEmpty() bool {
 	if s.Size == 0 {
 		return true
+	}
+
+	return false
+}
+
+func (s *Stack) Contains(data string) bool {
+	for i := 0; i < len(s.Items); i++ {
+		if s.Items[i] == data {
+			return true
+		}
 	}
 
 	return false
