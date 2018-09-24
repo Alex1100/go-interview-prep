@@ -1,6 +1,8 @@
 package adjacency_matrix
 
 import (
+	"errors"
+	graph_queue "go-interview-prep/data_structures/queues/graph_queue"
 	graph_stack "go-interview-prep/data_structures/stacks/graph_stack"
 )
 
@@ -191,4 +193,77 @@ func (g *Graph) DepthFirstSearch(vertex_key string) []string {
 	}
 
 	return visited_stack.Items
+}
+
+func (g *Graph) BFSUtil(source_node string, visited map[string]bool, vertex_queue graph_queue.Queue, result_queue graph_queue.Queue) ([]string, error) {
+	if result_queue.Size == len(g.NodeArray) {
+		return result_queue.Items, nil
+	}
+
+	if !visited[source_node] {
+		result_queue.Enqueue(source_node)
+		visited[source_node] = true
+	}
+
+	if vertex_queue.Contains(source_node) {
+		_, err := vertex_queue.Dequeue()
+		if err != nil {
+			return make([]string, 0), errors.New("Error popping queue")
+		}
+	}
+
+	var source_index int
+
+	for i, _ := range g.NodeArray {
+		if g.NodeArray[i] == source_node {
+			source_index = i
+		}
+	}
+
+	for j, edge := range g.Vertexes[source_index].Edges {
+		if !visited[g.NodeArray[j]] && edge == 1 {
+			vertex_queue.Enqueue(g.NodeArray[j])
+		}
+	}
+
+	for z := 0; z < len(vertex_queue.Items); z++ {
+		vertex, err := vertex_queue.Dequeue()
+		if err == nil {
+			res, err := g.BFSUtil(vertex, visited, vertex_queue, result_queue)
+			if err == nil {
+				result_queue.Items = res
+			} else {
+				return make([]string, 0), errors.New("Error popping vetex")
+			}
+		} else {
+			return make([]string, 0), errors.New("Error popping vertex")
+		}
+	}
+
+	return result_queue.Items, nil
+}
+
+func (g *Graph) BreadthFirstSearch(vertex_key string) ([]string, error) {
+	visited := make(map[string]bool)
+	vertex_queue := *graph_queue.InitQueue()
+	result_queue := *graph_queue.InitQueue()
+	res, err := g.BFSUtil(vertex_key, visited, vertex_queue, result_queue)
+	if err == nil {
+		result_queue.Items = res
+	} else {
+		return make([]string, 0), errors.New("Error popping vetex")
+	}
+
+	for _, vertex := range g.NodeArray {
+		if !visited[vertex] {
+			result, err := g.BFSUtil(vertex, visited, vertex_queue, result_queue)
+			if err == nil {
+				result_queue.Items = result
+			} else {
+				return make([]string, 0), errors.New("Error popping vetex")
+			}
+		}
+	}
+
+	return result_queue.Items, nil
 }

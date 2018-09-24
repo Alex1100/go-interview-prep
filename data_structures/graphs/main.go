@@ -138,5 +138,9 @@ func main() {
 	fmt.Println(adj_matrix.DepthFirstSearch("A"))
 	fmt.Println(adj_matrix.DepthFirstSearch("B"))
 	fmt.Println(adj_matrix.DepthFirstSearch("C"))
-
+	fmt.Println(adj_matrix.BreadthFirstSearch("A"))
+	fmt.Println(adj_matrix.BreadthFirstSearch("B"))
+	fmt.Println(adj_matrix.BreadthFirstSearch("C"))
+	fmt.Println(adj_matrix.BreadthFirstSearch("G"))
+	fmt.Println(adj_matrix.BreadthFirstSearch("H"))
 }
