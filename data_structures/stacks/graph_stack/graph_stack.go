@@ -21,6 +21,7 @@ func (s *Stack) Insert(item string) error {
 
 func (s *Stack) Pop() (string, error) {
 	removed := s.Items[len(s.Items)-1]
+
 	if len(s.Items) > 1 {
 		s.Items = s.Items[0 : len(s.Items)-1]
 	} else {

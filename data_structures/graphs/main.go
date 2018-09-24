@@ -154,7 +154,12 @@ func main() {
 	adj_matrix_2.AddEdge("A", "C")
 	fmt.Println(adj_matrix_2.HasCycle())
 	fmt.Println(adj_matrix_2.FindCycle())
+	fmt.Println("\n\nTOPOLOGICALLY SORTED::: ", adj_matrix.TopologicalSort())
+	fmt.Println("\n\nTOPOLOGICALLY SORTED::: ", adj_matrix_2.TopologicalSort())
+
 	adj_matrix_2.AddEdge("C", "A")
 	fmt.Println(adj_matrix_2.HasCycle())
 	fmt.Println(adj_matrix_2.FindCycle())
+	fmt.Println("\n\nTOPOLOGICALLY SORTED::: ", adj_matrix_2.TopologicalSort())
+
 }

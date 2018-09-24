@@ -321,3 +321,46 @@ func (g *Graph) FindCycle() string {
 
 	return g.FindCycleUtil(g.NodeArray[0], visited, visited_stack, 0)
 }
+
+func (g *Graph) TopologicalSort() []string {
+	result := make([]string, 0)
+	if g.HasCycle() {
+		return result
+	}
+
+	visited := make(map[string]bool)
+	non_dependent_vertexes := *graph_stack.InitStack()
+	vertex_stack := *graph_stack.InitStack()
+	vertex_map := make(map[string]*Vertex)
+
+	for i, vertex := range g.Vertexes {
+		for _, edge := range g.Vertexes[i].Edges {
+			if edge == 1 {
+				non_dependent_vertexes.Insert(g.NodeArray[i])
+				visited[g.NodeArray[i]] = true
+				vertex_map[g.NodeArray[i]] = vertex
+			}
+		}
+	}
+
+	for vertex_stack.Size < len(g.NodeArray) {
+		current := non_dependent_vertexes.Front()
+
+		for j, _ := range vertex_map[current].Edges {
+			if !visited[g.NodeArray[j]] && g.NodeArray[j] != current {
+				vertex_stack.Insert(g.NodeArray[j])
+				visited[g.NodeArray[j]] = true
+			}
+		}
+
+		popped, _ := non_dependent_vertexes.Pop()
+		vertex_stack.Insert(popped)
+	}
+
+	for vertex_stack.Size > 0 {
+		vertex, _ := vertex_stack.Pop()
+		result = append(result, vertex)
+	}
+
+	return result
+}
