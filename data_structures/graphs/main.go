@@ -123,5 +123,6 @@ func main() {
 	adj_matrix.AddEdge("C", "A")
 	fmt.Println(adj_matrix.HasEdge("A", "B"))
 	fmt.Println(adj_matrix.HasEdge("C", "A"))
+	fmt.Println(adj_matrix.HasEdge("C", "B"))
 	fmt.Println(adj_matrix.Vertexes[0], adj_matrix.Vertexes[1], adj_matrix.Vertexes[2])
 }

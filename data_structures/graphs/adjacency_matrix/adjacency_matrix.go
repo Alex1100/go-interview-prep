@@ -25,7 +25,9 @@ func (g *Graph) AddVertex(vertex_key string) bool {
 	g.Vertexes = append(g.Vertexes, &Vertex{Edges: make([]int, 0)})
 
 	for i, _ := range g.NodeArray {
+
 		new_vertex := make([]int, 0)
+
 		if len(g.Vertexes[i].Edges) > 0 {
 			for _, edge := range g.Vertexes[i].Edges {
 				new_vertex = append(new_vertex, edge)
@@ -121,21 +123,25 @@ func (g *Graph) AddEdges(from, to string) bool {
 }
 
 func (g *Graph) HasEdge(from, to string) bool {
-	var left bool = false
-	var right bool = false
+	var from_index int
+	var to_index int
 
-	for i, _ := range g.Vertexes {
-		for j, _ := range g.Vertexes[i].Edges {
-			if g.NodeArray[j] == from && g.Vertexes[i].Edges[j] > 0 {
-				left = true
-			}
+	for idx, vertex := range g.NodeArray {
+		if vertex == from {
+			from_index = idx
+		}
 
-			if g.NodeArray[j] == to && (g.Vertexes[i].Edges[j] > 0 || g.Vertexes[i].Edges[j] < 0) {
-				right = true
-			}
+		if vertex == to {
+			to_index = idx
 		}
 	}
-	return left && right
+	left := g.Vertexes[from_index].Edges[to_index]
+	right := g.Vertexes[to_index].Edges[from_index]
+	if (left > 0 || left < 0) && (right > 0 || right < 0) {
+		return true
+	}
+
+	return false
 }
 
 func (g *Graph) SameNodes(from, to string) bool {
