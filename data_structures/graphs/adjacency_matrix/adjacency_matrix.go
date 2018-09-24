@@ -1,5 +1,9 @@
 package adjacency_matrix
 
+import (
+	graph_stack "go-interview-prep/data_structures/stacks/graph_stack"
+)
+
 type Vertex struct {
 	Edges []int
 }
@@ -146,4 +150,45 @@ func (g *Graph) HasEdge(from, to string) bool {
 
 func (g *Graph) SameNodes(from, to string) bool {
 	return from == to
+}
+
+func (g *Graph) DFSUtil(source_node string, visited map[string]bool, visited_stack graph_stack.Stack) []string {
+	if visited_stack.Size == len(g.Vertexes) {
+		return visited_stack.Items
+	}
+
+	if !visited[source_node] {
+		visited_stack.Insert(source_node)
+		visited[source_node] = true
+	}
+
+	var source_index int
+
+	for i, _ := range g.NodeArray {
+		if g.NodeArray[i] == source_node {
+			source_index = i
+		}
+	}
+
+	for i, edge := range g.Vertexes[source_index].Edges {
+		if !visited[g.NodeArray[i]] && edge == 1 {
+			visited_stack.Items = g.DFSUtil(g.NodeArray[i], visited, visited_stack)
+		}
+	}
+
+	return visited_stack.Items
+}
+
+func (g *Graph) DepthFirstSearch(vertex_key string) []string {
+	visited := make(map[string]bool)
+	visited_stack := *graph_stack.InitStack()
+	visited_stack.Items = g.DFSUtil(vertex_key, visited, visited_stack)
+
+	for _, vertex := range g.NodeArray {
+		if !visited[vertex] {
+			visited_stack.Items = g.DFSUtil(vertex, visited, visited_stack)
+		}
+	}
+
+	return visited_stack.Items
 }
