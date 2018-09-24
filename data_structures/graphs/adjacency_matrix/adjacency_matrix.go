@@ -251,7 +251,7 @@ func (g *Graph) BreadthFirstSearch(vertex_key string) ([]string, error) {
 	if err == nil {
 		result_queue.Items = res
 	} else {
-		return make([]string, 0), errors.New("Error popping vetex")
+		return res, err
 	}
 
 	for _, vertex := range g.NodeArray {
@@ -260,10 +260,64 @@ func (g *Graph) BreadthFirstSearch(vertex_key string) ([]string, error) {
 			if err == nil {
 				result_queue.Items = result
 			} else {
-				return make([]string, 0), errors.New("Error popping vetex")
+				return result, err
 			}
 		}
 	}
 
 	return result_queue.Items, nil
+}
+
+func (g *Graph) HasCycleUtil(source_node string, visited map[string]bool, visited_stack graph_stack.Stack, source_index int) bool {
+	if !visited[source_node] {
+		visited_stack.Insert(source_node)
+		visited[source_node] = true
+
+		for j, edge := range g.Vertexes[source_index].Edges {
+			if edge == 1 {
+				if !visited[g.NodeArray[j]] && g.HasCycleUtil(g.NodeArray[j], visited, visited_stack, j) {
+					return true
+				} else if visited_stack.Contains(g.NodeArray[j]) {
+					return true
+				}
+			}
+		}
+	}
+
+	visited_stack.Pop()
+	return false
+}
+
+func (g *Graph) HasCycle() bool {
+	visited := make(map[string]bool)
+	visited_stack := *graph_stack.InitStack()
+
+	return g.HasCycleUtil(g.NodeArray[0], visited, visited_stack, 0)
+}
+
+func (g *Graph) FindCycleUtil(source_node string, visited map[string]bool, visited_stack graph_stack.Stack, source_index int) string {
+	if !visited[source_node] {
+		visited_stack.Insert(source_node)
+		visited[source_node] = true
+
+		for j, edge := range g.Vertexes[source_index].Edges {
+			if edge == 1 {
+				if !visited[g.NodeArray[j]] && len(g.FindCycleUtil(g.NodeArray[j], visited, visited_stack, j)) > 0 {
+					return g.NodeArray[j]
+				} else if visited_stack.Contains(g.NodeArray[j]) {
+					return g.NodeArray[j]
+				}
+			}
+		}
+	}
+
+	visited_stack.Pop()
+	return ""
+}
+
+func (g *Graph) FindCycle() string {
+	visited := make(map[string]bool)
+	visited_stack := *graph_stack.InitStack()
+
+	return g.FindCycleUtil(g.NodeArray[0], visited, visited_stack, 0)
 }

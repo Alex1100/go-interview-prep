@@ -143,4 +143,18 @@ func main() {
 	fmt.Println(adj_matrix.BreadthFirstSearch("C"))
 	fmt.Println(adj_matrix.BreadthFirstSearch("G"))
 	fmt.Println(adj_matrix.BreadthFirstSearch("H"))
+	fmt.Println(adj_matrix.HasCycle())
+	fmt.Println(adj_matrix.FindCycle())
+
+	adj_matrix_2 := *adjacency_matrix.InitAdjacencyMatrix()
+	adj_matrix_2.AddVertex("A")
+	adj_matrix_2.AddVertex("B")
+	adj_matrix_2.AddVertex("C")
+	adj_matrix_2.AddEdge("A", "B")
+	adj_matrix_2.AddEdge("A", "C")
+	fmt.Println(adj_matrix_2.HasCycle())
+	fmt.Println(adj_matrix_2.FindCycle())
+	adj_matrix_2.AddEdge("C", "A")
+	fmt.Println(adj_matrix_2.HasCycle())
+	fmt.Println(adj_matrix_2.FindCycle())
 }
