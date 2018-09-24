@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	adjacency_matrix "go-interview-prep/data_structures/graphs/adjacency_matrix"
 	graph "go-interview-prep/data_structures/graphs/graph"
 )
 
@@ -111,4 +112,16 @@ func main() {
 	} else {
 		fmt.Println(err)
 	}
+
+	adj_matrix := *adjacency_matrix.InitAdjacencyMatrix()
+
+	adj_matrix.AddVertex("A")
+	adj_matrix.AddVertex("B")
+	adj_matrix.AddVertex("C")
+	fmt.Println(adj_matrix.Vertexes[0], adj_matrix.Vertexes[1], adj_matrix.Vertexes[2])
+	adj_matrix.AddEdge("A", "B")
+	adj_matrix.AddEdge("C", "A")
+	fmt.Println(adj_matrix.HasEdge("A", "B"))
+	fmt.Println(adj_matrix.HasEdge("C", "A"))
+	fmt.Println(adj_matrix.Vertexes[0], adj_matrix.Vertexes[1], adj_matrix.Vertexes[2])
 }
