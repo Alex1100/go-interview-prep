@@ -132,10 +132,11 @@ func main() {
 	fmt.Println(adj_matrix.HasEdge("A", "B"))
 	fmt.Println(adj_matrix.HasEdge("C", "A"))
 	fmt.Println(adj_matrix.HasEdge("C", "B"))
-	fmt.Println(adj_matrix.Vertexes[0], adj_matrix.Vertexes[1], adj_matrix.Vertexes[2])
-	fmt.Println(adj_matrix.Vertexes[3], adj_matrix.Vertexes[4], adj_matrix.Vertexes[5])
-	fmt.Println(adj_matrix.Vertexes[6], adj_matrix.Vertexes[7])
-	fmt.Println(adj_matrix.DepthFirstSearch("A"))
+	for _, vertex := range adj_matrix.Vertexes {
+		fmt.Println(vertex.Edges)
+	}
+
+	fmt.Println("\n\n", adj_matrix.DepthFirstSearch("A"))
 	fmt.Println(adj_matrix.DepthFirstSearch("B"))
 	fmt.Println(adj_matrix.DepthFirstSearch("C"))
 	fmt.Println(adj_matrix.BreadthFirstSearch("A"))
